@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Occuply • Lease Mix Modeling (Dual Simulator)</title>
+  <style>
+    :root{
+      --navy:#1C2433;
+      --teal:#2FB7A3;
+      --bg:#0f1622;
+      --card:#141d2b;
+      --muted:#9fb0c3;
+      --text:#e9f1ff;
+      --border:rgba(255,255,255,.10);
+      --shadow: 0 14px 40px rgba(0,0,0,.35);
+      --radius:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      background: var(--bg);
+      color:var(--text);
+    }
+    .wrap{
+      max-width:1200px;
+      margin:20px auto 60px;
+      padding:0 20px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+    }
+    .card{
+      background: rgba(20,29,43,.85);
+      border:1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .cardHead{
+      padding:14px 16px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .content{ padding:16px }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    .row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(28,36,51,.35);
+    }
+    label{font-size:12px}
+    input, select{
+      width:130px;
+      padding:8px;
+      border-radius:10px;
+      background:#0f1622;
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.15);
+    }
+    .btns{display:flex;gap:10px;margin-top:14px}
+    button{
+      border:1px solid rgba(255,255,255,.15);
+      background: rgba(47,183,163,.12);
+      color:var(--text);
+      padding:10px 14px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.primary{
+      background: linear-gradient(140deg, rgba(47,183,163,.95), rgba(47,183,163,.45));
+      color:#0f1622;
+    }
+    button.ghost{background:rgba(28,36,51,.28)}
+
+    /* ===== Scenario CSS ===== */
+    .scenarios{
+      display:grid;
+      grid-template-columns: repeat(2,1fr);
+      gap:10px;
+      margin-bottom:16px;
+      padding:14px;
+      background: rgba(47,183,163,.08);
+      border:1px solid rgba(47,183,163,.25);
+      border-radius:14px;
+    }
+    .scenario-btn{
+      background: rgba(20,29,43,.95);
+      border:1px solid rgba(255,255,255,.18);
+      padding:12px;
+      border-radius:12px;
+      cursor:pointer;
+      transition:.2s;
+      text-align:left;
+    }
+    .scenario-btn:hover{
+      background: rgba(28,36,51,.95);
+      border-color: rgba(47,183,163,.45);
+      transform:translateY(-1px);
+    }
+    .scenario-btn .title{
+      font-weight:600;
+      font-size:13px;
+      margin-bottom:4px;
+    }
+    .scenario-btn .desc{
+      font-size:11px;
+      color:var(--muted);
+    }
+    .scenario-label{
+      grid-column:1/-1;
+      font-size:12px;
+      font-weight:600;
+      display:flex;
+      gap:6px;
+      align-items:center;
+    }
+    .scenario-label:before{content:"▶";color:var(--teal)}
+  </style>
+</head>
+
+<body>
+<div class="wrap">
+
+  <!-- LEFT -->
+  <section class="card">
+    <div class="cardHead"><h3>Renter Demand</h3></div>
+    <div class="content">
+      <div class="grid">
+        <div class="row"><label>Total renters</label><input id="rentersTotal" type="number"></div>
+        <div class="row"><label>% 1BR</label><input id="pct1br" type="number"></div>
+        <div class="row"><label>Budget fit</label><input id="budgetFit" type="range" min="0" max="100"></div>
+        <div class="row"><label>Urgency</label><input id="urgency" type="range" min="0" max="100"></div>
+        <div class="row"><label>Preference fit</label><input id="prefFit" type="range" min="0" max="100"></div>
+        <div class="row"><label>Competition</label><input id="compPressure" type="range" min="0" max="100"></div>
+        <div class="row"><label>Base conversion</label><input id="baseConv" type="number"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RIGHT -->
+  <section class="card">
+    <div class="cardHead"><h3>PMC Levers</h3></div>
+    <div class="content">
+
+      <!-- Scenario Selector -->
+      <div class="scenarios">
+        <div class="scenario-label">Load Preset Scenario:</div>
+
+        <button class="scenario-btn" data-scenario="sunbelt">
+          <div class="title">🌵 Sun Belt Oversupply</div>
+          <div class="desc">High vacancy, aggressive comps, thin demand.</div>
+        </button>
+
+        <button class="scenario-btn" data-scenario="leaseup">
+          <div class="title">🏗️ Lease-Up Crisis</div>
+          <div class="desc">85% vacant, demand exists but budget mismatch.</div>
+        </button>
+
+        <button class="scenario-btn" data-scenario="stabilized">
+          <div class="title">✅ Stabilized Portfolio</div>
+          <div class="desc">Low vacancy, strong fit, prevent waste.</div>
+        </button>
+
+        <button class="scenario-btn" data-scenario="blanket">
+          <div class="title">💸 Blanket Trap</div>
+          <div class="desc">Overusing concessions everywhere.</div>
+        </button>
+      </div>
+
+      <div class="grid">
+        <div class="row"><label>Vacant units</label><input id="vacantUnits" type="number"></div>
+        <div class="row"><label>1BR vacant</label><input id="avail1br" type="number"></div>
+        <div class="row"><label>Avg rent</label><input id="avgRent" type="number"></div>
+        <div class="row"><label>Strategy</label>
+          <select id="strategy">
+            <option value="blanket">Blanket</option>
+            <option value="targeted">Targeted</option>
+          </select>
+        </div>
+        <div class="row"><label>Months free</label><input id="monthsFree" type="number" step=".1"></div>
+        <div class="row"><label>Targeting</label><input id="targeting" type="range" min="0" max="100"></div>
+        <div class="row"><label>Underperforming %</label><input id="underperfShare" type="number"></div>
+      </div>
+
+      <div class="btns">
+        <button class="primary" id="runBtn">Run</button>
+        <button class="ghost" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+
+const scenarios = {
+  sunbelt:{rentersTotal:180,pct1br:58,budgetFit:52,urgency:68,prefFit:61,compPressure:82,baseConv:9.5,vacantUnits:52,avail1br:31,avgRent:1750,strategy:"blanket",monthsFree:1.2,targeting:45,underperfShare:68},
+  leaseup:{rentersTotal:265,pct1br:64,budgetFit:44,urgency:72,prefFit:58,compPressure:55,baseConv:8,vacantUnits:142,avail1br:88,avgRent:2150,strategy:"blanket",monthsFree:2,targeting:38,underperfShare:85},
+  stabilized:{rentersTotal:195,pct1br:62,budgetFit:78,urgency:58,prefFit:74,compPressure:48,baseConv:16.5,vacantUnits:18,avail1br:11,avgRent:2095,strategy:"targeted",monthsFree:.5,targeting:82,underperfShare:42},
+  blanket:{rentersTotal:210,pct1br:61,budgetFit:66,urgency:62,prefFit:68,compPressure:64,baseConv:11.5,vacantUnits:38,avail1br:24,avgRent:1925,strategy:"blanket",monthsFree:1.5,targeting:35,underperfShare:58}
+};
+
+function loadScenario(name){
+  const s=scenarios[name]; if(!s)return;
+  Object.keys(s).forEach(k=>$(k).value=s[k]);
+}
+
+document.querySelectorAll('[data-scenario]').forEach(b=>{
+  b.onclick=()=>loadScenario(b.dataset.scenario);
+});
+
+// Auto-run
+loadScenario('sunbelt');
+</script>
+</body>
+</html>
