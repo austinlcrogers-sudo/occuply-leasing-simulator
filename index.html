@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Occuply • Lease Mix Modeling (Dual Simulator)</title>
+  <title>Occuply • Lease Mix Modeling (Investor Demo)</title>
   <style>
     :root{
       --navy:#1C2433;
@@ -17,34 +17,146 @@
       --radius:18px;
       --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
       --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+
+      --good:#4ade80;
+      --warn:#ffcc66;
+      --bad:#ff7a7a;
+
+      --base:16px;
+      --label:13px;
+      --hint:12px;
+      --kpi:26px;
+      --kpiSmall:12px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family:var(--sans);
-      background: var(--bg);
+      font-size: var(--base);
+      background:
+        radial-gradient(1200px 600px at 15% 0%, rgba(47,183,163,.18), transparent 60%),
+        radial-gradient(900px 500px at 90% 10%, rgba(47,183,163,.10), transparent 55%),
+        var(--bg);
       color:var(--text);
     }
+    header{
+      padding:22px 20px 10px;
+      max-width:1280px;
+      margin:0 auto;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .brand{display:flex; gap:12px; align-items:center}
+    .mark{
+      width:42px; height:42px; border-radius:14px;
+      background: linear-gradient(140deg, rgba(47,183,163,.95), rgba(47,183,163,.35));
+      display:grid; place-items:center;
+      box-shadow: var(--shadow);
+      border:1px solid rgba(255,255,255,.12);
+    }
+    .slashes{width:20px;height:20px; position:relative}
+    .slashes:before,.slashes:after{
+      content:""; position:absolute; top:2px; bottom:2px;
+      width:6px; border-radius:2px; background:rgba(28,36,51,.95);
+      transform:skewX(-20deg) rotate(27deg);
+    }
+    .slashes:before{ left:3px }
+    .slashes:after{ left:11px }
+    h1{font-size:20px; margin:0; letter-spacing:.2px}
+    .sub{color:var(--muted); margin:6px 0 0; font-size:13px; max-width:880px; line-height:1.45}
+
+    .rightControls{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+
+    .tabs{
+      display:flex; gap:10px; align-items:center;
+      padding:8px;
+      background:rgba(20,29,43,.65);
+      border:1px solid var(--border);
+      border-radius:999px;
+      box-shadow: var(--shadow);
+    }
+    .tab{
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(28,36,51,.28);
+      color: var(--text);
+      padding:10px 14px;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight: 950;
+      font-size:12px;
+      letter-spacing:.2px;
+      user-select:none;
+    }
+    .tab.active{
+      background: linear-gradient(140deg, rgba(47,183,163,.95), rgba(47,183,163,.45));
+      border:1px solid rgba(47,183,163,.45);
+      color: rgba(28,36,51,.95);
+    }
+
+    .switch{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(20,29,43,.65);
+      box-shadow: var(--shadow);
+      user-select:none;
+      font-size:12px;
+      font-weight:950;
+      letter-spacing:.2px;
+    }
+    .switch input{appearance:none; width:44px; height:24px; border-radius:999px; position:relative; outline:none; cursor:pointer;
+      background: rgba(28,36,51,.7);
+      border:1px solid rgba(255,255,255,.14);
+    }
+    .switch input:before{
+      content:"";
+      position:absolute; width:18px; height:18px; top:2px; left:2px;
+      border-radius:999px;
+      background: rgba(233,241,255,.9);
+      transition: all .18s ease;
+    }
+    .switch input:checked{
+      background: rgba(47,183,163,.35);
+      border-color: rgba(47,183,163,.45);
+    }
+    .switch input:checked:before{ left:22px; background: rgba(28,36,51,.95) }
+
     .wrap{
-      max-width:1200px;
-      margin:20px auto 60px;
+      max-width:1280px;
+      margin:10px auto 60px;
       padding:0 20px;
       display:grid;
-      grid-template-columns: 1.1fr .9fr;
+      grid-template-columns: 1.05fr .95fr;
       gap:16px;
     }
     .card{
-      background: rgba(20,29,43,.85);
+      background: rgba(20,29,43,.88);
       border:1px solid var(--border);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
+      overflow:hidden;
     }
     .cardHead{
-      padding:14px 16px;
+      padding:16px 16px;
       border-bottom:1px solid var(--border);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+    }
+    .cardHead h2{margin:0; font-size:15px; letter-spacing:.2px}
+    .badge{
+      font-family: var(--mono);
+      color: rgba(233,241,255,.9);
+      background: rgba(47,183,163,.12);
+      border:1px solid rgba(47,183,163,.35);
+      padding:7px 10px;
+      border-radius: 999px;
+      font-size:12px;
     }
     .content{ padding:16px }
     .grid{
@@ -53,179 +165,1547 @@
       gap:12px;
     }
     .row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:10px 12px;
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:12px 12px;
       border:1px solid var(--border);
       border-radius:14px;
       background: rgba(28,36,51,.35);
     }
-    label{font-size:12px}
-    input, select{
-      width:130px;
-      padding:8px;
-      border-radius:10px;
-      background:#0f1622;
-      color:var(--text);
-      border:1px solid rgba(255,255,255,.15);
+    label{font-size:var(--label); font-weight:900; color:rgba(233,241,255,.94)}
+    .hint{font-size:var(--hint); color:var(--muted); margin-top:4px; line-height:1.3}
+    input[type="number"], input[type="text"], select{
+      width:154px;
+      padding:11px 11px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(15,22,34,.85);
+      color: var(--text);
+      outline:none;
+      font-size: 14px;
     }
-    .btns{display:flex;gap:10px;margin-top:14px}
+    input[type="range"]{ width: 240px; transform: translateY(1px); }
+    .btns{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top:14px;
+    }
     button{
-      border:1px solid rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.14);
       background: rgba(47,183,163,.12);
-      color:var(--text);
-      padding:10px 14px;
-      border-radius:14px;
+      color: var(--text);
+      padding:11px 14px;
+      border-radius: 14px;
       cursor:pointer;
-      font-weight:600;
+      font-weight: 950;
+      letter-spacing:.2px;
+      font-size: 13px;
     }
     button.primary{
       background: linear-gradient(140deg, rgba(47,183,163,.95), rgba(47,183,163,.45));
-      color:#0f1622;
+      border:1px solid rgba(47,183,163,.45);
+      color: rgba(28,36,51,.95);
     }
-    button.ghost{background:rgba(28,36,51,.28)}
+    button.ghost{ background: rgba(28,36,51,.28); }
 
-    /* ===== Scenario CSS ===== */
-    .scenarios{
-      display:grid;
-      grid-template-columns: repeat(2,1fr);
-      gap:10px;
-      margin-bottom:16px;
-      padding:14px;
+    .note{
+      margin-top:12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.55;
+    }
+
+    /* Scenarios */
+    .scenarios {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+      padding: 14px;
       background: rgba(47,183,163,.08);
-      border:1px solid rgba(47,183,163,.25);
-      border-radius:14px;
+      border: 1px solid rgba(47,183,163,.25);
+      border-radius: 14px;
     }
-    .scenario-btn{
+    .scenario-btn {
       background: rgba(20,29,43,.95);
-      border:1px solid rgba(255,255,255,.18);
-      padding:12px;
-      border-radius:12px;
-      cursor:pointer;
-      transition:.2s;
-      text-align:left;
+      border: 1px solid rgba(255,255,255,.18);
+      padding: 12px;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 12px;
+      transition: all 0.2s;
     }
-    .scenario-btn:hover{
+    .scenario-btn:hover {
       background: rgba(28,36,51,.95);
       border-color: rgba(47,183,163,.45);
-      transform:translateY(-1px);
+      transform: translateY(-1px);
     }
-    .scenario-btn .title{
-      font-weight:600;
-      font-size:13px;
-      margin-bottom:4px;
+    .scenario-btn .title { font-weight: 950; font-size: 13px; color: var(--text); margin-bottom: 4px; }
+    .scenario-btn .desc { font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .scenario-label {
+      grid-column: 1 / -1;
+      font-size: 13px;
+      font-weight: 950;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .scenario-btn .desc{
-      font-size:11px;
-      color:var(--muted);
+    .scenario-label:before { content: "▶"; color: var(--teal); }
+
+    /* KPIs */
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      margin-top:14px;
     }
-    .scenario-label{
-      grid-column:1/-1;
-      font-size:12px;
-      font-weight:600;
+    .kpi{
+      padding:12px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background: rgba(28,36,51,.35);
+    }
+    .kpi .t{font-size:12px; color:var(--muted); font-weight:950}
+    .kpi .v{font-size:var(--kpi); margin-top:6px; font-family: var(--mono); font-weight:950}
+    .kpi .s{font-size:var(--kpiSmall); color:rgba(233,241,255,.82); margin-top:6px; line-height:1.35}
+
+    .callout{
+      margin-top:12px;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,22,34,.55);
+    }
+    .callout .title{font-weight:950; font-size:13px; margin-bottom:6px}
+    .callout .body{font-size:13px; color:rgba(233,241,255,.88); line-height:1.55}
+    .callout.good{border-color: rgba(74,222,128,.35); background: rgba(74,222,128,.08)}
+    .callout.warn{border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.08)}
+    .callout.bad{border-color: rgba(255,122,122,.35); background: rgba(255,122,122,.08)}
+
+    /* Comparison */
+    .compare{
+      margin-top:14px;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(47,183,163,.25);
+      background: rgba(47,183,163,.06);
+    }
+    .compareHead{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      margin-bottom:10px;
+    }
+    .compareHead .h{ font-weight: 950; font-size: 13px; }
+    .compareHead .p{ color: var(--muted); font-size: 12px; line-height:1.35; max-width: 620px; }
+    .compareGrid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
+    .compareCard{
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(20,29,43,.92);
+    }
+    .compareCard .name{
+      font-weight: 950;
+      font-size: 13px;
       display:flex;
-      gap:6px;
+      justify-content:space-between;
       align-items:center;
+      margin-bottom:8px;
     }
-    .scenario-label:before{content:"▶";color:var(--teal)}
+    .mini{ font-size:12px; color: var(--muted); line-height:1.45; margin-top:8px; }
+    .delta{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px dashed rgba(255,255,255,.14);
+      background: rgba(15,22,34,.45);
+      font-size: 13px;
+      line-height:1.55;
+    }
+    .pill{
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      font-family:var(--mono);
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(15,22,34,.55);
+      color:rgba(233,241,255,.92);
+    }
+
+    .bars{
+      margin-top:10px;
+      display:grid;
+      gap:10px;
+    }
+    .barRow{
+      display:grid;
+      grid-template-columns: 110px 1fr 90px;
+      gap:10px;
+      align-items:center;
+      font-size:12px;
+      color:rgba(233,241,255,.86);
+    }
+    .barTrack{
+      height:12px;
+      border-radius:999px;
+      background: rgba(28,36,51,.55);
+      border:1px solid rgba(255,255,255,.10);
+      overflow:hidden;
+    }
+    .barFill{
+      height:100%;
+      width: 0%;
+      background: linear-gradient(140deg, rgba(47,183,163,.95), rgba(47,183,163,.35));
+    }
+    .barFill.blanket{
+      background: linear-gradient(140deg, rgba(255,204,102,.9), rgba(255,204,102,.35));
+    }
+
+    details{
+      margin-top: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(15,22,34,.45);
+      padding: 10px 12px;
+    }
+    summary{
+      cursor:pointer;
+      font-weight: 950;
+      font-size: 13px;
+      color: rgba(233,241,255,.92);
+    }
+    .assumptions{
+      margin-top:10px;
+      display:grid;
+      gap:10px;
+    }
+    .assRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(28,36,51,.35);
+    }
+    .assRow .left{min-width:240px}
+    .assRow .left .hint{margin:4px 0 0}
+    .assRow input[type="number"]{ width:140px }
+
+    .script{
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(47,183,163,.25);
+      background: rgba(47,183,163,.06);
+    }
+    .scriptHead{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .scriptHead .h{font-weight:950; font-size:13px}
+    .steps{
+      margin-top:10px;
+      display:grid;
+      gap:10px;
+    }
+    .step{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(20,29,43,.92);
+    }
+    .step .n{
+      width:26px;height:26px;border-radius:10px;
+      display:grid;place-items:center;
+      background: rgba(47,183,163,.18);
+      border:1px solid rgba(47,183,163,.35);
+      font-weight:950;
+      font-family: var(--mono);
+    }
+    .step .t{font-weight:950; font-size:13px}
+    .step .d{font-size:12px; color: var(--muted); line-height:1.45; margin-top:3px}
+    .step button{margin-top:8px; padding:9px 12px; border-radius:12px; font-size:12px}
+
+    .hidden{ display:none !important; }
+    .table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0 8px;
+      margin-top: 12px;
+      font-size: 13px;
+    }
+    .table th{
+      text-align:left;
+      color: var(--muted);
+      font-weight:950;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+    .table td{
+      background: rgba(28,36,51,.35);
+      border:1px solid var(--border);
+      padding:10px;
+      vertical-align:top;
+    }
+    .table td:first-child{ border-radius: 12px 0 0 12px }
+    .table td:last-child{ border-radius: 0 12px 12px 0 }
+
+    .good{ color: var(--good); }
+    .warn{ color: var(--warn); }
+    .bad{ color: var(--bad); }
+
+    /* Data Inputs Checklist */
+    .dataPanel{
+      margin-top:12px;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(15,22,34,.45);
+    }
+    .dataPanelHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .dataPanelHead .h{font-weight:950; font-size:13px}
+    .dataPanelHead .p{color:var(--muted); font-size:12px; line-height:1.35; max-width: 640px}
+    .checks{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    .check{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(28,36,51,.30);
+    }
+    .check .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.18);
+      margin-top:4px;
+      flex:0 0 auto;
+    }
+    .check.on .dot{
+      background: rgba(47,183,163,.85);
+      border-color: rgba(47,183,163,.55);
+    }
+    .check .t{font-weight:950; font-size:12px}
+    .check .d{color:var(--muted); font-size:12px; line-height:1.35; margin-top:2px}
+    .tag{
+      display:inline-block;
+      margin-left:8px;
+      padding:3px 8px;
+      border-radius:999px;
+      font-size:11px;
+      font-family:var(--mono);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,29,43,.9);
+      color: rgba(233,241,255,.90);
+    }
+    .tag.demo{ border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.10); }
+    .tag.prod{ border-color: rgba(74,222,128,.35); background: rgba(74,222,128,.10); }
+
+    /* Investor Summary Overlay */
+    .overlayWrap{
+      position: fixed;
+      inset: 0;
+      pointer-events:none;
+      display:none;
+      z-index: 50;
+    }
+    body.boardroom .overlayWrap{ display:block; }
+    .overlayScrim{
+      position:absolute;
+      inset:0;
+      background: linear-gradient(180deg, rgba(12,18,28,.82), rgba(12,18,28,.35));
+      opacity:0;
+      transition: opacity .18s ease;
+    }
+    .overlayPanel{
+      position:absolute;
+      right:18px;
+      bottom:18px;
+      width: min(520px, calc(100vw - 36px));
+      max-height: calc(100vh - 120px);
+      overflow:auto;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(20,29,43,.92);
+      box-shadow: var(--shadow);
+      opacity:0;
+      transform: translateY(10px);
+      transition: opacity .18s ease, transform .18s ease;
+      pointer-events:auto;
+    }
+    body.boardroom .overlayScrim.show{ opacity:1; }
+    body.boardroom .overlayPanel.show{ opacity:1; transform: translateY(0); }
+
+    .overlayHead{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+    }
+    .overlayHead .h{
+      font-weight:950;
+      font-size:13px;
+      line-height:1.2;
+    }
+    .overlayHead .p{
+      color: var(--muted);
+      font-size:12px;
+      line-height:1.35;
+      margin-top:6px;
+      max-width: 430px;
+    }
+    .overlayHead .actions{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .overlayBody{ padding: 12px 14px 14px; display:grid; gap:10px; }
+    .ibox{
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(15,22,34,.55);
+    }
+    .ibox .t{ font-weight:950; font-size:12px; color: rgba(233,241,255,.92) }
+    .ibox .d{ margin-top:6px; font-size:12px; color: rgba(233,241,255,.86); line-height:1.45 }
+    .ibox .d b{ color: rgba(233,241,255,.95) }
+    .kline{
+      display:flex;
+      justify-content:space-between;
+      align-items:baseline;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:8px;
+    }
+    .kline .k{ color: var(--muted); font-size:12px; }
+    .kline .v{ font-family: var(--mono); font-weight:950; font-size:12px; }
+    .overlayFooter{
+      padding: 10px 14px 14px;
+      border-top:1px solid rgba(255,255,255,.10);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    /* Boardroom Mode rules */
+    body.boardroom .inputsSection { display:none !important; }
+    body.boardroom .hint { display:none !important; }
+    body.boardroom .note { font-size:14px; }
+    body.boardroom .kpi .v{ font-size: 34px; }
+    body.boardroom .kpis{ grid-template-columns: repeat(3, 1fr); }
+    body.boardroom .table { display:none !important; }
+    body.boardroom header{ padding-bottom: 6px; }
+    body.boardroom .script{ display:none !important; }
+
+    @media (max-width: 1040px){
+      .wrap{ grid-template-columns: 1fr; }
+      input[type="range"]{ width: 180px; }
+      .kpis{ grid-template-columns: 1fr; }
+      .compareGrid{ grid-template-columns: 1fr; }
+      body.boardroom .kpis{ grid-template-columns: 1fr; }
+      .checks{ grid-template-columns: 1fr; }
+    }
+
+    /* ===== One-click demo highlight ===== */
+    @keyframes pulseGlow {
+      0%   { box-shadow: 0 0 0 rgba(47,183,163,0); transform: translateY(0); }
+      30%  { box-shadow: 0 0 0 6px rgba(47,183,163,.18); transform: translateY(-1px); }
+      60%  { box-shadow: 0 0 0 12px rgba(47,183,163,.10); transform: translateY(0); }
+      100% { box-shadow: 0 0 0 rgba(47,183,163,0); }
+    }
+    .pulse {
+      animation: pulseGlow 1.2s ease-out 0s 2;
+      border-color: rgba(47,183,163,.55) !important;
+    }
   </style>
 </head>
 
 <body>
-<div class="wrap">
-
-  <!-- LEFT -->
-  <section class="card">
-    <div class="cardHead"><h3>Renter Demand</h3></div>
-    <div class="content">
-      <div class="grid">
-        <div class="row"><label>Total renters</label><input id="rentersTotal" type="number"></div>
-        <div class="row"><label>% 1BR</label><input id="pct1br" type="number"></div>
-        <div class="row"><label>Budget fit</label><input id="budgetFit" type="range" min="0" max="100"></div>
-        <div class="row"><label>Urgency</label><input id="urgency" type="range" min="0" max="100"></div>
-        <div class="row"><label>Preference fit</label><input id="prefFit" type="range" min="0" max="100"></div>
-        <div class="row"><label>Competition</label><input id="compPressure" type="range" min="0" max="100"></div>
-        <div class="row"><label>Base conversion</label><input id="baseConv" type="number"></div>
+<header>
+  <div class="brand">
+    <div class="mark"><div class="slashes" aria-hidden="true"></div></div>
+    <div>
+      <h1>Occuply • Lease Mix Modeling</h1>
+      <div class="sub">
+        A decision layer for leasing: predict lift, prevent concession leakage, and standardize targeted playbooks.
       </div>
+    </div>
+  </div>
+
+  <div class="rightControls">
+    <button class="primary" id="oneClickBtn" title="Runs the full investor demo flow automatically">One-Click Demo</button>
+
+    <label class="switch" title="Optimizes layout for investor meetings / screenshares">
+      Boardroom Mode
+      <input id="boardroomToggle" type="checkbox" />
+    </label>
+
+    <label class="switch" title="Simulates the boost you get when verified intent + friction tags exist (more precision, less leakage)">
+      Production Data
+      <input id="prodToggle" type="checkbox" />
+    </label>
+
+    <div class="tabs" role="tablist" aria-label="View toggle">
+      <div class="tab active" id="tabSingle" role="tab" aria-selected="true">Single Asset</div>
+      <div class="tab" id="tabPortfolio" role="tab" aria-selected="false">Portfolio View</div>
+    </div>
+
+    <button class="ghost" id="overlayBtn" title="Show the investor summary overlay (Boardroom Mode)">Investor Summary</button>
+    <button class="ghost" id="printBtn" title="Print or save as PDF for an investor email">Export PDF</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- LEFT: DEMAND -->
+  <section class="card">
+    <div class="cardHead">
+      <h2>Demand + Inputs</h2>
+      <span class="badge">Model Setup</span>
+    </div>
+    <div class="content">
+
+      <div class="note" style="margin-top:0">
+        This is a demo model: explainable, conservative, and designed to highlight the decision (targeted vs blanket), not pretend it’s perfect.
+      </div>
+
+      <div class="dataPanel" aria-label="Data inputs panel">
+        <div class="dataPanelHead">
+          <div>
+            <div class="h">Data Inputs: Demo vs Production</div>
+            <div class="p">
+              Investors care if you know what real data you’ll need. This checklist says “we’re not guessing.”
+            </div>
+          </div>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+            <span class="pill" id="dataModePill">DEMO MODE</span>
+          </div>
+        </div>
+
+        <div class="checks" id="checksGrid"></div>
+
+        <div class="note" style="margin-top:10px">
+          <b>Production Data toggle</b> simulates what happens when these signals exist: higher precision, lower leakage, better CPI.
+        </div>
+      </div>
+
+      <div class="inputsSection">
+        <div class="grid" style="margin-top:12px">
+          <div class="row">
+            <div>
+              <label>Total renters (next 30 days)</label>
+              <div class="hint">Verified in production; manual input in demo</div>
+            </div>
+            <input id="rentersTotal" type="number" min="0" step="10" value="180">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>% needing 1BR</label>
+              <div class="hint">Unit-type mix</div>
+            </div>
+            <input id="pct1br" type="number" min="0" max="100" step="1" value="58">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>% needing 2BR</label>
+              <div class="hint">Auto-calculated</div>
+            </div>
+            <input id="pct2br" type="number" min="0" max="100" step="1" value="42" disabled>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Budget fit (0–100)</label>
+              <div class="hint">How well renters match your pricing band</div>
+            </div>
+            <input id="budgetFit" type="range" min="0" max="100" value="52">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Preference fit (0–100)</label>
+              <div class="hint">Amenities/location/product fit</div>
+            </div>
+            <input id="prefFit" type="range" min="0" max="100" value="61">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Urgency (0–100)</label>
+              <div class="hint">Higher urgency = faster decisions</div>
+            </div>
+            <input id="urgency" type="range" min="0" max="100" value="68">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Competition (0–100)</label>
+              <div class="hint">Higher = comps are aggressive</div>
+            </div>
+            <input id="compPressure" type="range" min="0" max="100" value="82">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Baseline conversion (%)</label>
+              <div class="hint">Lead-to-lease without new incentives</div>
+            </div>
+            <input id="baseConv" type="number" min="0" max="100" step="0.5" value="9.5">
+          </div>
+        </div>
+      </div>
+
+      <details>
+        <summary>Model assumptions (tunable)</summary>
+        <div class="assumptions">
+          <div class="assRow">
+            <div class="left">
+              <label>Vacancy cost per unit per day</label>
+              <div class="hint">Default = avgRent / 30</div>
+            </div>
+            <input id="vacCostDay" type="number" min="0" step="1" value="0">
+          </div>
+          <div class="assRow">
+            <div class="left">
+              <label>Max incentive lift (ceiling)</label>
+              <div class="hint">Diminishing returns: can’t lift forever</div>
+            </div>
+            <input id="maxLift" type="number" min="0" max="0.60" step="0.01" value="0.22">
+          </div>
+          <div class="assRow">
+            <div class="left">
+              <label>Diminishing returns factor</label>
+              <div class="hint">Higher = lift saturates faster</div>
+            </div>
+            <input id="satK" type="number" min="0.2" max="3" step="0.1" value="1.3">
+          </div>
+        </div>
+      </details>
+
+      <div class="script">
+        <div class="scriptHead">
+          <div>
+            <div class="h">Demo Script (3 clicks, no confusion)</div>
+            <div class="note" style="margin:6px 0 0">
+              You should never spend investor time explaining UI.
+            </div>
+          </div>
+          <button class="ghost" id="copyTalkBtn">Copy 30-sec Talk Track</button>
+        </div>
+
+        <div class="steps">
+          <div class="step">
+            <div class="n">1</div>
+            <div>
+              <div class="t">Load scenario</div>
+              <div class="d">Use Sun Belt Oversupply to prove blanket leakage.</div>
+              <button class="ghost" id="step1Btn">Load Sun Belt</button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="n">2</div>
+            <div>
+              <div class="t">Run model</div>
+              <div class="d">Shows expected leases, CPI, net proxy, and recommendation.</div>
+              <button class="ghost" id="step2Btn">Run Model</button>
+            </div>
+          </div>
+          <div class="step">
+            <div class="n">3</div>
+            <div>
+              <div class="t">Prove it</div>
+              <div class="d">Blanket vs Targeted comparison: winner + delta.</div>
+              <button class="ghost" id="step3Btn">Run Comparison</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <!-- RIGHT -->
-  <section class="card">
-    <div class="cardHead"><h3>PMC Levers</h3></div>
+  <!-- RIGHT: SINGLE ASSET -->
+  <section class="card" id="singleCard">
+    <div class="cardHead">
+      <h2>PMC Levers + Results</h2>
+      <span class="badge">Decision</span>
+    </div>
     <div class="content">
 
-      <!-- Scenario Selector -->
-      <div class="scenarios">
-        <div class="scenario-label">Load Preset Scenario:</div>
+      <div class="inputsSection">
+        <div class="scenarios">
+          <div class="scenario-label">Preset Scenarios (storytelling)</div>
 
-        <button class="scenario-btn" data-scenario="sunbelt">
-          <div class="title">🌵 Sun Belt Oversupply</div>
-          <div class="desc">High vacancy, aggressive comps, thin demand.</div>
-        </button>
+          <button class="scenario-btn" data-scenario="sunbelt">
+            <div class="title">🌵 Sun Belt Oversupply</div>
+            <div class="desc">High vacancy, aggressive comps, thin demand. Perfect “don’t blanket” case.</div>
+          </button>
 
-        <button class="scenario-btn" data-scenario="leaseup">
-          <div class="title">🏗️ Lease-Up Crisis</div>
-          <div class="desc">85% vacant, demand exists but budget mismatch.</div>
-        </button>
+          <button class="scenario-btn" data-scenario="leaseup">
+            <div class="title">🏗️ Lease-Up Crisis</div>
+            <div class="desc">New build, heavy vacancy, budget mismatch killing conversion.</div>
+          </button>
 
-        <button class="scenario-btn" data-scenario="stabilized">
-          <div class="title">✅ Stabilized Portfolio</div>
-          <div class="desc">Low vacancy, strong fit, prevent waste.</div>
-        </button>
+          <button class="scenario-btn" data-scenario="stabilized">
+            <div class="title">✅ Stabilized Asset</div>
+            <div class="desc">Low vacancy, strong fit. Goal: govern concessions (prevent waste).</div>
+          </button>
 
-        <button class="scenario-btn" data-scenario="blanket">
-          <div class="title">💸 Blanket Trap</div>
-          <div class="desc">Overusing concessions everywhere.</div>
-        </button>
-      </div>
-
-      <div class="grid">
-        <div class="row"><label>Vacant units</label><input id="vacantUnits" type="number"></div>
-        <div class="row"><label>1BR vacant</label><input id="avail1br" type="number"></div>
-        <div class="row"><label>Avg rent</label><input id="avgRent" type="number"></div>
-        <div class="row"><label>Strategy</label>
-          <select id="strategy">
-            <option value="blanket">Blanket</option>
-            <option value="targeted">Targeted</option>
-          </select>
+          <button class="scenario-btn" data-scenario="blanket">
+            <div class="title">💸 Blanket Trap</div>
+            <div class="desc">Over-discounting everywhere. Show targeted beats blanket.</div>
+          </button>
         </div>
-        <div class="row"><label>Months free</label><input id="monthsFree" type="number" step=".1"></div>
-        <div class="row"><label>Targeting</label><input id="targeting" type="range" min="0" max="100"></div>
-        <div class="row"><label>Underperforming %</label><input id="underperfShare" type="number"></div>
+
+        <div class="grid">
+          <div class="row">
+            <div>
+              <label>Vacant units</label>
+              <div class="hint">Caps leases (capacity constraint)</div>
+            </div>
+            <input id="vacantUnits" type="number" min="0" step="1" value="52">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>1BR vacant</label>
+              <div class="hint">Auto-capped at vacancy</div>
+            </div>
+            <input id="avail1br" type="number" min="0" step="1" value="31">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>2BR vacant</label>
+              <div class="hint">Auto-calculated</div>
+            </div>
+            <input id="avail2br" type="number" min="0" step="1" value="21" disabled>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Avg rent</label>
+              <div class="hint">Used for economics proxy</div>
+            </div>
+            <input id="avgRent" type="number" min="0" step="25" value="1750">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Strategy</label>
+              <div class="hint">Blanket = everyone. Targeted = friction units.</div>
+            </div>
+            <select id="strategy">
+              <option value="blanket" selected>Blanket</option>
+              <option value="targeted">Targeted</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Months free</label>
+              <div class="hint">Intensity (0.0–2.0)</div>
+            </div>
+            <input id="monthsFree" type="number" min="0" max="2" step="0.1" value="1.2">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Targeting precision (0–100)</label>
+              <div class="hint">Higher = less leakage + more lift</div>
+            </div>
+            <input id="targeting" type="range" min="0" max="100" value="45">
+          </div>
+
+          <div class="row">
+            <div>
+              <label>Underperforming share (%)</label>
+              <div class="hint">% vacancy in slow floorplans</div>
+            </div>
+            <input id="underperfShare" type="number" min="0" max="100" step="1" value="68">
+          </div>
+        </div>
       </div>
 
       <div class="btns">
         <button class="primary" id="runBtn">Run</button>
         <button class="ghost" id="resetBtn">Reset</button>
+        <button id="copyBtn">Copy Summary</button>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">Expected leases (30d)</div>
+          <div class="v" id="kLeases">—</div>
+          <div class="s" id="kLeasesSub">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Incremental leases</div>
+          <div class="v" id="kIncr">—</div>
+          <div class="s" id="kIncrSub">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Cost / incremental lease</div>
+          <div class="v" id="kCPI">—</div>
+          <div class="s" id="kCPISub">—</div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="t">Concession spend (est.)</div>
+          <div class="v" id="kConcSpend">—</div>
+          <div class="s" id="kConcSpendSub">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Vacancy $ avoided (est.)</div>
+          <div class="v" id="kAvoid">—</div>
+          <div class="s" id="kAvoidSub">—</div>
+        </div>
+        <div class="kpi">
+          <div class="t">Net impact (proxy)</div>
+          <div class="v" id="kNet">—</div>
+          <div class="s" id="kNetSub">—</div>
+        </div>
+      </div>
+
+      <div id="callout" class="callout">
+        <div class="title" id="calloutTitle">Executive Recommendation</div>
+        <div class="body" id="calloutBody">Run to see recommendation.</div>
+      </div>
+
+      <div class="compare" aria-label="Blanket vs Targeted comparison">
+        <div class="compareHead">
+          <div>
+            <div class="h">Blanket vs Targeted</div>
+            <div class="p">Same market inputs. Two strategies. Winner based on net proxy (avoided vacancy − concessions).</div>
+          </div>
+          <button class="ghost" id="compareBtn">Run Comparison</button>
+        </div>
+
+        <div class="compareGrid">
+          <div class="compareCard" id="blanketCard">
+            <div class="name">
+              <span>💸 Blanket</span>
+              <span class="pill" id="b_tag">—</span>
+            </div>
+            <div class="kpis" style="margin-top:0">
+              <div class="kpi">
+                <div class="t">Leases</div>
+                <div class="v" id="b_leases">—</div>
+                <div class="s" id="b_leasesSub">—</div>
+              </div>
+              <div class="kpi">
+                <div class="t">Spend</div>
+                <div class="v" id="b_spend">—</div>
+                <div class="s" id="b_spendSub">—</div>
+              </div>
+              <div class="kpi">
+                <div class="t">CPI (inc. lease)</div>
+                <div class="v" id="b_cpi">—</div>
+                <div class="s" id="b_cpiSub">—</div>
+              </div>
+            </div>
+            <div class="mini" id="b_mini">—</div>
+          </div>
+
+          <div class="compareCard" id="targetedCard">
+            <div class="name">
+              <span>🎯 Targeted</span>
+              <span class="pill" id="t_tag">—</span>
+            </div>
+            <div class="kpis" style="margin-top:0">
+              <div class="kpi">
+                <div class="t">Leases</div>
+                <div class="v" id="t_leases">—</div>
+                <div class="s" id="t_leasesSub">—</div>
+              </div>
+              <div class="kpi">
+                <div class="t">Spend</div>
+                <div class="v" id="t_spend">—</div>
+                <div class="s" id="t_spendSub">—</div>
+              </div>
+              <div class="kpi">
+                <div class="t">CPI (inc. lease)</div>
+                <div class="v" id="t_cpi">—</div>
+                <div class="s" id="t_cpiSub">—</div>
+              </div>
+            </div>
+            <div class="mini" id="t_mini">—</div>
+          </div>
+        </div>
+
+        <div class="bars">
+          <div class="barRow">
+            <div>Net impact</div>
+            <div class="barTrack"><div class="barFill blanket" id="barBlanket"></div></div>
+            <div style="text-align:right" id="barBlanketVal">—</div>
+          </div>
+          <div class="barRow">
+            <div>Net impact</div>
+            <div class="barTrack"><div class="barFill" id="barTargeted"></div></div>
+            <div style="text-align:right" id="barTargetedVal">—</div>
+          </div>
+        </div>
+
+        <div class="delta" id="deltaBox">
+          <b>Delta:</b> Run comparison to see which strategy wins and by how much.
+        </div>
+      </div>
+
+      <div class="note">
+        This demo is intentionally explainable. The production product is “data in → recommendation out,” with governance and measurable lift.
       </div>
     </div>
   </section>
+
+  <!-- RIGHT: PORTFOLIO (placeholder) -->
+  <section class="card hidden" id="portfolioCard">
+    <div class="cardHead">
+      <h2>Portfolio View</h2>
+      <span class="badge">Roll-up</span>
+    </div>
+    <div class="content">
+      <div class="note" style="margin-top:0">
+        Portfolio mode is in the build plan. (We can wire it in next, but keeping this demo focused.)
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer style="max-width:1280px;margin:0 auto;padding:0 20px 22px;color:rgba(159,176,195,.85);font-size:12px;line-height:1.45;">
+  Tip: Click <b>One-Click Demo</b> for meetings. It sets the stage and highlights the delta automatically.
+</footer>
+
+<!-- Investor Summary Overlay -->
+<div class="overlayWrap" id="overlayWrap" aria-hidden="true">
+  <div class="overlayScrim" id="overlayScrim"></div>
+
+  <div class="overlayPanel" id="overlayPanel" role="dialog" aria-label="Investor Summary">
+    <div class="overlayHead">
+      <div>
+        <div class="h">Investor Summary</div>
+        <div class="p">
+          The “what / why / so what” in one place. Use this while screensharing.
+        </div>
+      </div>
+      <div class="actions">
+        <button class="ghost" id="copyOverlayBtn">Copy Summary</button>
+        <button class="ghost" id="closeOverlayBtn">Close</button>
+      </div>
+    </div>
+
+    <div class="overlayBody">
+      <div class="ibox">
+        <div class="t">Problem</div>
+        <div class="d">
+          Multifamily operators leak money through blanket concessions and slow leasing velocity. Teams discount without knowing if it creates <b>incremental leases</b>.
+        </div>
+      </div>
+
+      <div class="ibox">
+        <div class="t">Insight</div>
+        <div class="d">
+          Treat leasing like a measurable decision: combine <b>demand fit</b> + <b>competition</b> + <b>unit friction</b>, then choose <b>targeted</b> incentives with governance.
+        </div>
+      </div>
+
+      <div class="ibox">
+        <div class="t">Demo result (current scenario)</div>
+        <div class="d">
+          Expected leases: <b><span id="o_leases">—</span></b> • Incremental: <b><span id="o_incr">—</span></b><br>
+          Concession spend: <b><span id="o_spend">—</span></b> • Net impact proxy: <b><span id="o_net">—</span></b><br>
+          Winner: <b><span id="o_winner">—</span></b>
+          <div class="kline">
+            <div class="k">Key takeaway</div>
+            <div class="v" id="o_takeaway">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ibox">
+        <div class="t">Business model</div>
+        <div class="d">
+          B2B for PMCs/owners: a decision layer + governance. Priced as platform fee + optional performance tied to measurable incrementality/leakage reduction.
+        </div>
+      </div>
+
+      <div class="ibox">
+        <div class="t">Next steps</div>
+        <div class="d">
+          1) Integrate verified intent + CRM conversion history<br>
+          2) Add unit-level friction tags<br>
+          3) Run controlled tests (A/B) to validate lift and lock pricing.
+        </div>
+      </div>
+    </div>
+
+    <div class="overlayFooter">
+      <span id="o_modeNote">Mode: —</span>
+      <span>Use One-Click Demo for meetings</span>
+    </div>
+  </div>
 </div>
 
 <script>
-const $ = id => document.getElementById(id);
-const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+  // ===== Helpers =====
+  const $ = (id) => document.getElementById(id);
+  const clamp = (n,a,b)=> Math.max(a, Math.min(b,n));
+  const fmt = (n,d=0)=> Number(n).toLocaleString(undefined,{maximumFractionDigits:d, minimumFractionDigits:d});
+  const money = (n)=> (n<0?"-":"") + "$" + Math.abs(n).toLocaleString(undefined,{maximumFractionDigits:0});
+  const pct = (x)=> `${Math.round(x)}%`;
+  const logit = (p)=> Math.log(p/(1-p));
+  const logistic = (z)=> 1/(1+Math.exp(-z));
 
-const scenarios = {
-  sunbelt:{rentersTotal:180,pct1br:58,budgetFit:52,urgency:68,prefFit:61,compPressure:82,baseConv:9.5,vacantUnits:52,avail1br:31,avgRent:1750,strategy:"blanket",monthsFree:1.2,targeting:45,underperfShare:68},
-  leaseup:{rentersTotal:265,pct1br:64,budgetFit:44,urgency:72,prefFit:58,compPressure:55,baseConv:8,vacantUnits:142,avail1br:88,avgRent:2150,strategy:"blanket",monthsFree:2,targeting:38,underperfShare:85},
-  stabilized:{rentersTotal:195,pct1br:62,budgetFit:78,urgency:58,prefFit:74,compPressure:48,baseConv:16.5,vacantUnits:18,avail1br:11,avgRent:2095,strategy:"targeted",monthsFree:.5,targeting:82,underperfShare:42},
-  blanket:{rentersTotal:210,pct1br:61,budgetFit:66,urgency:62,prefFit:68,compPressure:64,baseConv:11.5,vacantUnits:38,avail1br:24,avgRent:1925,strategy:"blanket",monthsFree:1.5,targeting:35,underperfShare:58}
-};
+  // ===== Tabs =====
+  function setTab(which){
+    const single = $("singleCard");
+    const port = $("portfolioCard");
+    const tS = $("tabSingle");
+    const tP = $("tabPortfolio");
+    if(which==="single"){
+      single.classList.remove("hidden");
+      port.classList.add("hidden");
+      tS.classList.add("active"); tP.classList.remove("active");
+      tS.setAttribute("aria-selected","true"); tP.setAttribute("aria-selected","false");
+    } else {
+      port.classList.remove("hidden");
+      single.classList.add("hidden");
+      tP.classList.add("active"); tS.classList.remove("active");
+      tP.setAttribute("aria-selected","true"); tS.setAttribute("aria-selected","false");
+    }
+  }
+  $("tabSingle").addEventListener("click", ()=>setTab("single"));
+  $("tabPortfolio").addEventListener("click", ()=>setTab("portfolio"));
 
-function loadScenario(name){
-  const s=scenarios[name]; if(!s)return;
-  Object.keys(s).forEach(k=>$(k).value=s[k]);
-}
+  // ===== Boardroom Mode =====
+  function setBoardroom(on){
+    document.body.classList.toggle("boardroom", !!on);
+    localStorage.setItem("occ_boardroom", on ? "1" : "0");
+    $("boardroomToggle").checked = !!on;
+  }
+  $("boardroomToggle").addEventListener("change", e => setBoardroom(e.target.checked));
+  setBoardroom(localStorage.getItem("occ_boardroom")==="1");
 
-document.querySelectorAll('[data-scenario]').forEach(b=>{
-  b.onclick=()=>loadScenario(b.dataset.scenario);
-});
+  // Export PDF
+  $("printBtn").addEventListener("click", ()=> window.print());
 
-// Auto-run
-loadScenario('sunbelt');
+  // ===== Production Data toggle =====
+  function setProd(on){
+    localStorage.setItem("occ_prod", on ? "1" : "0");
+    $("prodToggle").checked = !!on;
+    $("dataModePill").textContent = on ? "PRODUCTION-LIKE" : "DEMO MODE";
+    renderChecks();
+    simulateSingle();
+    runComparison();
+    updateOverlayFromKPIs();
+  }
+  $("prodToggle").addEventListener("change", e => setProd(e.target.checked));
+
+  // ===== Data checks =====
+  const checkDefs = [
+    { key:"intent", name:"Verified Renter Intent", desc:"Where/when/budget verified (not just clicks).", demo:false },
+    { key:"crm", name:"CRM Conversion History", desc:"Lead→tour→app→lease by channel and property.", demo:false },
+    { key:"friction", name:"Unit-Level Friction Tags", desc:"Floorplan objections, price bands, availability quirks.", demo:false },
+    { key:"comps", name:"Competitive Comp Set Signals", desc:"Concessions, pricing changes, vacancy pressure.", demo:false },
+    { key:"govern", name:"Offer Governance Rules", desc:"Exposure caps, guardrails, approval workflow.", demo:true },
+    { key:"test", name:"Lift Measurement (A/B)", desc:"Control vs test to prove incrementality.", demo:true },
+    { key:"portfolio", name:"Portfolio Optimization", desc:"Allocate demand + incentives across assets.", demo:true },
+    { key:"ops", name:"Operator Workflow", desc:"Weekly cadence: review, adjust, learn.", demo:true }
+  ];
+
+  function renderChecks(){
+    const prod = localStorage.getItem("occ_prod")==="1";
+    const grid = $("checksGrid");
+    grid.innerHTML = checkDefs.map(c=>{
+      const on = c.demo || prod;
+      const tag = c.demo ? `<span class="tag demo">DEMO</span>` : `<span class="tag prod">PROD</span>`;
+      return `
+        <div class="check ${on ? "on":""}">
+          <div class="dot" aria-hidden="true"></div>
+          <div>
+            <div class="t">${c.name} ${tag}</div>
+            <div class="d">${c.desc}</div>
+          </div>
+        </div>
+      `;
+    }).join("");
+    $("o_modeNote").textContent = `Mode: ${prod ? "Production-like (signals toggled on)" : "Demo (manual inputs + explainable model)"}`;
+  }
+
+  // ===== Sync splits =====
+  function syncSplits(){
+    const p1 = clamp(Number($("pct1br").value||0),0,100);
+    $("pct1br").value = p1;
+    $("pct2br").value = 100 - p1;
+
+    const v = clamp(Number($("vacantUnits").value||0),0,100000);
+    const a1 = clamp(Number($("avail1br").value||0),0,v);
+    $("vacantUnits").value = v;
+    $("avail1br").value = a1;
+    $("avail2br").value = v - a1;
+  }
+  ["pct1br","vacantUnits","avail1br"].forEach(id=>{
+    $(id).addEventListener("input", syncSplits);
+    $(id).addEventListener("change", syncSplits);
+  });
+
+  // ===== Scenario presets =====
+  const scenarios = {
+    sunbelt: { rentersTotal:180,pct1br:58,budgetFit:52,urgency:68,prefFit:61,compPressure:82,baseConv:9.5,
+      vacantUnits:52,avail1br:31,avgRent:1750,strategy:"blanket",monthsFree:1.2,targeting:45,underperfShare:68 },
+    leaseup: { rentersTotal:265,pct1br:64,budgetFit:44,urgency:72,prefFit:58,compPressure:55,baseConv:8.0,
+      vacantUnits:142,avail1br:88,avgRent:2150,strategy:"blanket",monthsFree:2.0,targeting:38,underperfShare:85 },
+    stabilized: { rentersTotal:195,pct1br:62,budgetFit:78,urgency:58,prefFit:74,compPressure:48,baseConv:16.5,
+      vacantUnits:18,avail1br:11,avgRent:2095,strategy:"targeted",monthsFree:0.5,targeting:82,underperfShare:42 },
+    blanket: { rentersTotal:210,pct1br:61,budgetFit:66,urgency:62,prefFit:68,compPressure:64,baseConv:11.5,
+      vacantUnits:38,avail1br:24,avgRent:1925,strategy:"blanket",monthsFree:1.5,targeting:35,underperfShare:58 }
+  };
+
+  function loadScenario(name){
+    const s = scenarios[name]; if(!s) return;
+
+    $("rentersTotal").value = s.rentersTotal;
+    $("pct1br").value = s.pct1br;
+    $("budgetFit").value = s.budgetFit;
+    $("urgency").value = s.urgency;
+    $("prefFit").value = s.prefFit;
+    $("compPressure").value = s.compPressure;
+    $("baseConv").value = s.baseConv;
+
+    $("vacantUnits").value = s.vacantUnits;
+    $("avail1br").value = s.avail1br;
+    $("avgRent").value = s.avgRent;
+    $("strategy").value = s.strategy;
+    $("monthsFree").value = s.monthsFree;
+    $("targeting").value = s.targeting;
+    $("underperfShare").value = s.underperfShare;
+
+    syncSplits();
+    simulateSingle();
+    runComparison();
+    updateOverlayFromKPIs();
+  }
+  document.querySelectorAll("[data-scenario]").forEach(btn=>{
+    btn.addEventListener("click", e => loadScenario(e.currentTarget.dataset.scenario));
+  });
+
+  // ===== Assumptions + Inputs =====
+  function getAssumptions(avgRent){
+    const vacCostDay = Number($("vacCostDay").value||0);
+    const maxLift = clamp(Number($("maxLift").value||0.22), 0, 0.60);
+    const satK = clamp(Number($("satK").value||1.3), 0.2, 3.0);
+    return {
+      vacCostDay: vacCostDay > 0 ? vacCostDay : (avgRent/30),
+      maxLift,
+      satK
+    };
+  }
+
+  function getCurrentInputs(){
+    syncSplits();
+
+    const rentersTotal = Math.max(0, Number($("rentersTotal").value||0));
+    const pct1 = Number($("pct1br").value||0) / 100;
+    const baseConv = clamp(Number($("baseConv").value||0),0,100) / 100;
+
+    const budgetFit = Number($("budgetFit").value||0) / 100;
+    const prefFit = Number($("prefFit").value||0) / 100;
+    const urgency = Number($("urgency").value||0) / 100;
+    const compPressure = Number($("compPressure").value||0) / 100;
+
+    const vacantUnits = Math.max(0, Number($("vacantUnits").value||0));
+    const avail1 = Math.max(0, Number($("avail1br").value||0));
+    const avail2 = Math.max(0, Number($("avail2br").value||0));
+    const avgRent = Math.max(0, Number($("avgRent").value||0));
+    const strategy = $("strategy").value;
+    const monthsFree = clamp(Number($("monthsFree").value||0), 0, 2);
+    const targeting = Number($("targeting").value||0) / 100;
+    const underperfShare = clamp(Number($("underperfShare").value||0),0,100) / 100;
+
+    const ass = getAssumptions(avgRent);
+
+    return {
+      rentersTotal, pct1, baseConv,
+      budgetFit, prefFit, urgency, compPressure,
+      vacantUnits, avail1, avail2,
+      avgRent, strategy, monthsFree, targeting, underperfShare,
+      ...ass
+    };
+  }
+
+  // ===== Model =====
+  function modelLeaseOutcomes(inp){
+    const {
+      rentersTotal, pct1, baseConv,
+      budgetFit, prefFit, urgency, compPressure,
+      vacantUnits, avail1, avail2,
+      avgRent, strategy, monthsFree, targeting, underperfShare,
+      vacCostDay, maxLift, satK
+    } = inp;
+
+    const pct2 = 1 - pct1;
+    const demand1 = rentersTotal * pct1;
+    const demand2 = rentersTotal * pct2;
+
+    const fit = clamp((0.46*budgetFit + 0.38*prefFit + 0.16*urgency), 0, 1);
+
+    const base = clamp(baseConv, 0.01, 0.60);
+    const z0 = logit(base);
+    const z =
+      z0
+      + 1.15*(fit - 0.50)
+      + 0.40*(urgency - 0.50)
+      - 0.95*(compPressure - 0.50);
+
+    const pBase = clamp(logistic(z), 0.01, 0.70);
+
+    const prod = localStorage.getItem("occ_prod")==="1";
+    const prodTargetBoost = prod ? 0.10 : 0.0;
+    const prodLeakageCut  = prod ? 0.10 : 0.0;
+    const prodFitBoost    = prod ? 0.04 : 0.0;
+
+    const targEff = clamp(targeting + prodTargetBoost, 0, 1);
+    const fitEff  = clamp(fit + prodFitBoost, 0, 1);
+
+    const intensity = 1 - Math.exp(-satK * monthsFree);
+    const precision = (strategy==="targeted")
+      ? clamp(0.55 + 0.45*targEff, 0.55, 1.0)
+      : 1.0;
+
+    const compPenalty = clamp(1 - 0.45*compPressure, 0.55, 1.0);
+
+    const rawLift = maxLift * intensity * precision * compPenalty;
+    const effectiveLift = (strategy==="targeted") ? rawLift * underperfShare : rawLift * 0.70;
+
+    const pPost = clamp(pBase + effectiveLift + 0.04*(fitEff - fit), 0.01, 0.82);
+
+    const baseLeases1 = Math.min(avail1, Math.round(demand1 * pBase));
+    const baseLeases2 = Math.min(avail2, Math.round(demand2 * pBase));
+    const baseLeasesTotal = baseLeases1 + baseLeases2;
+
+    const leases1 = Math.min(avail1, Math.round(demand1 * pPost));
+    const leases2 = Math.min(avail2, Math.round(demand2 * pPost));
+    const leasesTotal = leases1 + leases2;
+
+    const incrementalLeases = Math.max(0, leasesTotal - baseLeasesTotal);
+
+    const coverageBase = (strategy==="blanket")
+      ? 1.0
+      : clamp(underperfShare * (0.60 + 0.40*targEff), 0.18, 0.90);
+
+    const coverage = clamp(coverageBase - prodLeakageCut*(strategy==="targeted" ? 1 : 0), 0.12, 1.0);
+
+    const concessionSpend = leasesTotal * monthsFree * avgRent * coverage;
+    const costPerIncremental = incrementalLeases > 0 ? (concessionSpend / incrementalLeases) : Infinity;
+
+    const daysSaved = clamp(8 + 14*urgency + 4*(1-compPressure), 8, 22);
+    const vacancyAvoidedValue = incrementalLeases * daysSaved * vacCostDay;
+    const netImpact = vacancyAvoidedValue - concessionSpend;
+
+    return {
+      fitEff,
+      pBase, pPost,
+      baseLeasesTotal,
+      leasesTotal,
+      incrementalLeases,
+      coverage,
+      concessionSpend,
+      costPerIncremental,
+      daysSaved,
+      vacancyAvoidedValue,
+      netImpact,
+      effectiveLift
+    };
+  }
+
+  // ===== Single Asset =====
+  function simulateSingle(){
+    const inp = getCurrentInputs();
+    const out = modelLeaseOutcomes(inp);
+
+    $("kLeases").textContent = fmt(out.leasesTotal,0);
+    $("kLeasesSub").textContent =
+      `Baseline ${out.baseLeasesTotal} → Post ${out.leasesTotal} | Conv ${pct(out.pBase*100)} → ${pct(out.pPost*100)} | Fit ${pct(out.fitEff*100)}`;
+
+    $("kIncr").textContent = fmt(out.incrementalLeases,0);
+    $("kIncrSub").textContent =
+      out.incrementalLeases===0 ? "No incrementality predicted." : `Lift ≈ ${pct(out.effectiveLift*100)} (diminishing returns applied).`;
+
+    $("kCPI").textContent = (out.costPerIncremental===Infinity) ? "—" : money(out.costPerIncremental);
+    $("kCPISub").textContent =
+      (out.costPerIncremental===Infinity) ? "No inc leases → CPI undefined." : "Spend ÷ incremental leases.";
+
+    $("kConcSpend").textContent = money(out.concessionSpend);
+    $("kConcSpendSub").textContent = `${(inp.monthsFree).toFixed(1)} mo free • Coverage ${pct(out.coverage*100)} • Strategy ${inp.strategy}`;
+
+    $("kAvoid").textContent = money(out.vacancyAvoidedValue);
+    $("kAvoidSub").textContent = `~${fmt(out.daysSaved,0)} days saved / inc lease • ${money(inp.vacCostDay)}/day`;
+
+    $("kNet").textContent = money(out.netImpact);
+    $("kNetSub").textContent = "Vacancy avoided value − concession spend (proxy).";
+
+    const call = $("callout");
+    const title = $("calloutTitle");
+    const body = $("calloutBody");
+
+    const weakFit = out.fitEff < 0.55;
+    const highComp = inp.compPressure > 0.65;
+    const lotsVac = inp.vacantUnits >= 40;
+
+    if(inp.vacantUnits===0){
+      call.className = "callout good";
+      title.textContent = "Recommendation: Protect rent, don’t discount";
+      body.textContent = "No vacancy. Use governance to prevent offer creep and plan pre-leasing.";
+    } else if(weakFit){
+      call.className = "callout bad";
+      title.textContent = "Recommendation: Fix fit before discounting";
+      body.textContent = "Mismatch makes concessions expensive noise. Fix pricing bands, messaging, and friction first.";
+    } else if(inp.strategy==="blanket" && highComp && lotsVac){
+      call.className = "callout warn";
+      title.textContent = "Recommendation: Stop blanket leakage — go targeted";
+      body.textContent = "This is where blanket burns cash. Concentrate offers on underperforming floorplans with governance and measured lift.";
+    } else if(out.incrementalLeases===0){
+      call.className = "callout bad";
+      title.textContent = "Recommendation: Incentives aren’t solving the problem";
+      body.textContent = "Model predicts no incrementality. You likely need more demand sources or a fit/friction fix.";
+    } else {
+      call.className = "callout good";
+      title.textContent = "Recommendation: Targeted incentives + governance";
+      body.textContent = "Measurable lift with controlled exposure. Track weekly lift and prevent concession creep across teams.";
+    }
+  }
+
+  // ===== Comparison =====
+  function setCompareCard(prefix, out, label){
+    $(prefix+"_tag").textContent = label;
+
+    $(prefix+"_leases").textContent = fmt(out.leasesTotal,0);
+    $(prefix+"_leasesSub").textContent = `Inc: ${fmt(out.incrementalLeases,0)} • Conv: ${pct(out.pPost*100)} • Fit: ${pct(out.fitEff*100)}`;
+
+    $(prefix+"_spend").textContent = money(out.concessionSpend);
+    $(prefix+"_spendSub").textContent = `Coverage ${pct(out.coverage*100)} • Lift ${pct(out.effectiveLift*100)}`;
+
+    $(prefix+"_cpi").textContent = (out.costPerIncremental===Infinity) ? "—" : money(out.costPerIncremental);
+    $(prefix+"_cpiSub").textContent = (out.costPerIncremental===Infinity) ? "No inc leases" : "Spend ÷ inc leases";
+
+    const mini = `Baseline: ${fmt(out.baseLeasesTotal,0)} • Avoided: ${money(out.vacancyAvoidedValue)} • Net: ${money(out.netImpact)}`;
+    $(prefix+"_mini").textContent = mini;
+  }
+
+  function setBars(blanketNet, targetedNet){
+    const maxAbs = Math.max(Math.abs(blanketNet), Math.abs(targetedNet), 1);
+    const bPct = Math.round((Math.abs(blanketNet)/maxAbs)*100);
+    const tPct = Math.round((Math.abs(targetedNet)/maxAbs)*100);
+    $("barBlanket").style.width = bPct + "%";
+    $("barTargeted").style.width = tPct + "%";
+    $("barBlanketVal").textContent = money(blanketNet);
+    $("barTargetedVal").textContent = money(targetedNet);
+  }
+
+  let lastCompare = { winner:"—", dNet:0 };
+
+  function runComparison(){
+    const inp = getCurrentInputs();
+
+    const bOut = modelLeaseOutcomes({ ...inp, strategy:"blanket" });
+    const tOut = modelLeaseOutcomes({ ...inp, strategy:"targeted" });
+
+    setCompareCard("b", bOut, `monthsFree=${inp.monthsFree.toFixed(1)}`);
+    setCompareCard("t", tOut, `monthsFree=${inp.monthsFree.toFixed(1)} • targeting=${Math.round(inp.targeting*100)}`);
+
+    setBars(bOut.netImpact, tOut.netImpact);
+
+    const dLeases = tOut.leasesTotal - bOut.leasesTotal;
+    const dSpend  = tOut.concessionSpend - bOut.concessionSpend;
+    const dNet    = tOut.netImpact - bOut.netImpact;
+
+    const better = (tOut.netImpact > bOut.netImpact) ? "Targeted" : "Blanket";
+    lastCompare = { winner: better, dNet };
+
+    const sign = (n)=> (n>=0 ? "+" : "−");
+    const absMoney = (n)=> money(Math.abs(n));
+    const absNum = (n)=> fmt(Math.abs(n),0);
+
+    $("deltaBox").innerHTML =
+      `<b>Delta (Targeted − Blanket):</b>
+       <span class="${dLeases>=0?"good":"bad"}">${sign(dLeases)}${absNum(dLeases)} leases</span>,
+       <span class="${dSpend<=0?"good":"warn"}">${sign(dSpend)}${absMoney(dSpend)} spend</span>,
+       <span class="${dNet>=0?"good":"bad"}">${sign(dNet)}${absMoney(dNet)} net</span>.
+       <br><b class="${better==="Targeted"?"good":"warn"}">Winner: ${better}</b>`;
+  }
+
+  // ===== Overlay =====
+  function openOverlay(){
+    $("overlayWrap").setAttribute("aria-hidden","false");
+    $("overlayScrim").classList.add("show");
+    $("overlayPanel").classList.add("show");
+    updateOverlayFromKPIs();
+  }
+  function closeOverlay(){
+    $("overlayWrap").setAttribute("aria-hidden","true");
+    $("overlayScrim").classList.remove("show");
+    $("overlayPanel").classList.remove("show");
+  }
+  $("overlayBtn").addEventListener("click", ()=>{
+    const open = $("overlayPanel").classList.contains("show");
+    open ? closeOverlay() : openOverlay();
+  });
+  $("closeOverlayBtn").addEventListener("click", closeOverlay);
+  $("overlayScrim").addEventListener("click", closeOverlay);
+
+  function updateOverlayFromKPIs(){
+    $("o_leases").textContent = $("kLeases").textContent;
+    $("o_incr").textContent = $("kIncr").textContent;
+    $("o_spend").textContent = $("kConcSpend").textContent;
+    $("o_net").textContent = $("kNet").textContent;
+    $("o_winner").textContent = lastCompare.winner;
+
+    const prod = localStorage.getItem("occ_prod")==="1";
+    let takeaway = "Run comparison to compute winner.";
+    if($("kLeases").textContent !== "—"){
+      if(lastCompare.winner === "Targeted"){
+        takeaway = `Targeted wins by ${money(Math.abs(lastCompare.dNet))} net proxy: less leakage + more incremental leases.`;
+      } else if(lastCompare.winner === "Blanket"){
+        takeaway = `Blanket wins in this setup. Audit leakage risk and validate incrementality.`;
+      }
+      takeaway += prod ? " (Production-like signals ON)" : " (Demo signals)";
+    }
+    $("o_takeaway").textContent = takeaway;
+    $("o_modeNote").textContent = `Mode: ${prod ? "Production-like (signals toggled on)" : "Demo (manual inputs + explainable model)"}`;
+  }
+
+  $("copyOverlayBtn").addEventListener("click", async ()=>{
+    const text =
+`Occuply — Investor Summary
+Expected leases (30d): ${$("kLeases").textContent}
+Incremental leases: ${$("kIncr").textContent}
+Concession spend: ${$("kConcSpend").textContent}
+Net impact proxy: ${$("kNet").textContent}
+Winner (Blanket vs Targeted): ${lastCompare.winner}
+Recommendation: ${$("calloutTitle").textContent} — ${$("calloutBody").textContent}`;
+    try{
+      await navigator.clipboard.writeText(text);
+      $("copyOverlayBtn").textContent = "Copied!";
+      setTimeout(()=> $("copyOverlayBtn").textContent="Copy Summary", 1200);
+    } catch(e){
+      alert("Clipboard blocked by browser for local files. Host it and try again.");
+    }
+  });
+
+  // ===== Buttons =====
+  $("runBtn").addEventListener("click", ()=>{ simulateSingle(); runComparison(); updateOverlayFromKPIs(); });
+  $("compareBtn").addEventListener("click", ()=>{ runComparison(); updateOverlayFromKPIs(); });
+
+  $("resetBtn").addEventListener("click", ()=>{ loadScenario("sunbelt"); });
+
+  $("copyBtn").addEventListener("click", async ()=>{
+    const text =
+`Occuply LMM — Summary
+Expected leases (30d): ${$("kLeases").textContent}
+Incremental leases: ${$("kIncr").textContent}
+Concession spend: ${$("kConcSpend").textContent}
+Cost per incremental lease: ${$("kCPI").textContent}
+Net impact proxy: ${$("kNet").textContent}
+Winner: ${lastCompare.winner}`;
+    try{
+      await navigator.clipboard.writeText(text);
+      $("copyBtn").textContent = "Copied!";
+      setTimeout(()=> $("copyBtn").textContent="Copy Summary", 1200);
+    } catch(e){
+      alert("Clipboard blocked by browser for local files. Host it and try again.");
+    }
+  });
+
+  $("copyTalkBtn").addEventListener("click", async ()=>{
+    const talk =
+`30-second talk track:
+“Occuply is a decision layer for leasing. We ingest demand fit and competitive pressure and, in production, add verified intent + friction tags.
+Then we test blanket vs targeted concessions and measure incrementality.
+In this scenario, we predict ${$("kIncr").textContent} incremental leases with ${$("kNet").textContent} net proxy impact.
+The point is reducing concession leakage and standardizing playbooks across a portfolio.”`;
+    try{
+      await navigator.clipboard.writeText(talk);
+      $("copyTalkBtn").textContent = "Copied!";
+      setTimeout(()=> $("copyTalkBtn").textContent="Copy 30-sec Talk Track", 1200);
+    } catch(e){
+      alert("Clipboard blocked by browser for local files. Host it and try again.");
+    }
+  });
+
+  // ===== One-click demo flow =====
+  function pulse(el){
+    if(!el) return;
+    el.classList.remove("pulse");
+    void el.offsetWidth; // restart animation
+    el.classList.add("pulse");
+    setTimeout(()=> el.classList.remove("pulse"), 2600);
+  }
+
+  function highlightWinner(){
+    const b = $("blanketCard");
+    const t = $("targetedCard");
+    b.classList.remove("pulse"); t.classList.remove("pulse");
+    if(lastCompare.winner === "Targeted") pulse(t);
+    if(lastCompare.winner === "Blanket") pulse(b);
+  }
+
+  function oneClickDemo(){
+    // 1) Put user in the right view
+    setTab("single");
+
+    // 2) Boardroom mode on (clean screen)
+    setBoardroom(true);
+
+    // 3) Load default story scenario
+    loadScenario("sunbelt");
+
+    // 4) Run and compare
+    simulateSingle();
+    runComparison();
+
+    // 5) Open investor overlay
+    openOverlay();
+
+    // 6) Highlight where eyes should go
+    pulse($("deltaBox"));
+    highlightWinner();
+    pulse($("overlayPanel"));
+  }
+
+  $("oneClickBtn").addEventListener("click", oneClickDemo);
+
+  // ===== Init =====
+  renderChecks();
+  setProd(localStorage.getItem("occ_prod")==="1");
+  syncSplits();
+  loadScenario("sunbelt"); // auto-run default
+  runComparison();
+  updateOverlayFromKPIs();
 </script>
 </body>
 </html>
