@@ -1,61 +1,872 @@
-<!-- LMM Strategy Card -->
-<div class="strategy-card lmm-strategy-card">
-  <div class="card-label">Recommended</div>
-  
-  <h3>Strategy</h3>
-  <p><strong>Target Budget-Conscious Movers to ground floors</strong></p>
-  
-  <h4>Price</h4>
-  <p>$1,650 (13% discount from $1,900 upper floors)</p>
-  
-  <h4>Messaging</h4>
-  <p>"Ground Floor Convenience | Pet-Friendly | Easy Access"</p>
-  
-  <h4>Concession</h4>
-  <p>1 month free (ONLY to Budget-Conscious profile)</p>
-  
-  <h4>ILS targeting</h4>
-  <p>Adjust filters to attract $1,400–1,700 segment</p>
-  
-  <!-- Metrics that will animate -->
-  <div class="metrics-grid">
-    <div class="metric">
-      <div class="metric-label">Units filled</div>
-      <div class="metric-value">
-        <span class="units-filled-number">8</span> of 12
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Occuply Lease Mix Modeling - Investor POC Demo</title>
+  <style>
+    /* CSS Variables */
+    :root {
+      --navy: #1a1f36;
+      --teal: #16a085;
+      --coral: #ff6b35;
+      --light-grey: #f7f9fc;
+      --medium-grey: #5a6378;
+      --border-grey: #e1e8ed;
+    }
+    
+    /* Reset and Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #fff;
+    }
+    
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--navy);
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+    
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+    
+    .header-note {
+      font-size: 0.9rem;
+      opacity: 0.7;
+      margin-top: 20px;
+    }
+    
+    /* Section Styles */
+    section {
+      padding: 80px 20px;
+    }
+    
+    section:nth-child(even) {
+      background: var(--light-grey);
+    }
+    
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: var(--navy);
+    }
+    
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--medium-grey);
+      margin-bottom: 40px;
+      max-width: 800px;
+    }
+    
+    /* Problem Section */
+    .problem-section {
+      text-align: center;
+    }
+    
+    .chart-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .stat-callout {
+      background: var(--coral);
+      color: white;
+      padding: 30px;
+      border-radius: 8px;
+      max-width: 600px;
+      margin: 40px auto;
+    }
+    
+    .stat-callout .big-number {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .stat-callout .explanation {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+    
+    /* Profile Cards */
+    .profile-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 40px 0;
+    }
+    
+    .profile-card {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      border: 3px solid var(--border-grey);
+      transition: all 0.3s ease;
+      opacity: 0.5;
+    }
+    
+    .profile-card.highlighted {
+      opacity: 1;
+      border-color: var(--teal);
+      box-shadow: 0 4px 16px rgba(22, 160, 133, 0.2);
+      transform: scale(1.02);
+    }
+    
+    .profile-card h3 {
+      color: var(--navy);
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+    
+    .profile-badge {
+      display: inline-block;
+      background: var(--teal);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+    
+    .profile-badge.not-match {
+      background: var(--medium-grey);
+    }
+    
+    .profile-item {
+      margin-bottom: 15px;
+    }
+    
+    .profile-label {
+      font-size: 0.85rem;
+      color: var(--medium-grey);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .profile-value {
+      color: var(--navy);
+      font-size: 1rem;
+    }
+    
+    .match-arrow {
+      text-align: center;
+      font-size: 2rem;
+      color: var(--teal);
+      margin: 30px 0;
+      font-weight: bold;
+    }
+    
+    /* Scenario Selector */
+    .scenario-selector {
+      max-width: 900px;
+      margin: 0 auto 40px;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .scenario-title {
+      font-size: 1.5rem;
+      color: var(--navy);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    
+    .scenario-subtitle {
+      font-size: 1rem;
+      color: var(--medium-grey);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .scenario-buttons {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 15px;
+    }
+    
+    .scenario-button {
+      background: white;
+      border: 3px solid var(--border-grey);
+      padding: 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+    
+    .scenario-button:hover {
+      border-color: var(--teal);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(22, 160, 133, 0.2);
+    }
+    
+    .scenario-button.active {
+      border-color: var(--teal);
+      background: linear-gradient(135deg, rgba(22, 160, 133, 0.1) 0%, rgba(22, 160, 133, 0.05) 100%);
+    }
+    
+    .scenario-button h4 {
+      color: var(--navy);
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    
+    .scenario-button p {
+      color: var(--medium-grey);
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+    
+    .scenario-label {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    
+    .scenario-label.default {
+      background: var(--medium-grey);
+      color: white;
+    }
+    
+    .scenario-label.recommended {
+      background: var(--teal);
+      color: white;
+    }
+    
+    .scenario-label.light {
+      background: var(--light-grey);
+      color: var(--navy);
+      border: 2px solid var(--border-grey);
+    }
+    
+    /* Results Display */
+    .results-display {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .results-title {
+      font-size: 1.5rem;
+      color: var(--navy);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .metric {
+      text-align: center;
+      padding: 20px;
+      background: var(--light-grey);
+      border-radius: 6px;
+    }
+    
+    .metric-label {
+      font-size: 0.85rem;
+      color: var(--medium-grey);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .metric-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--navy);
+    }
+    
+    .metric-value.positive {
+      color: var(--teal);
+    }
+    
+    .metric-value.negative {
+      color: var(--coral);
+    }
+    
+    /* ROI Callout */
+    .roi-callout {
+      padding: 25px;
+      background: linear-gradient(135deg, var(--teal) 0%, #138871 100%);
+      border-radius: 8px;
+      text-align: center;
+      color: white;
+    }
+    
+    .roi-big {
+      font-size: 2rem;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .roi-detail {
+      font-size: 1rem;
+      opacity: 0.95;
+    }
+    
+    /* Comparison Table */
+    .comparison-table {
+      max-width: 900px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-grey);
+    }
+    
+    th {
+      background: var(--navy);
+      color: white;
+      font-weight: 600;
+    }
+    
+    tr:last-child td {
+      border-bottom: none;
+    }
+    
+    tr:nth-child(even) {
+      background: var(--light-grey);
+    }
+    
+    .table-highlight {
+      color: var(--teal);
+      font-weight: bold;
+    }
+    
+    /* CTA Section */
+    .cta-section {
+      background: var(--navy);
+      color: white;
+      text-align: center;
+    }
+    
+    .cta-section .section-title {
+      color: white;
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+    
+    .cta-section .section-subtitle {
+      color: rgba(255,255,255,0.9);
+      font-size: 1.2rem;
+      margin: 0 auto 40px;
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: var(--coral);
+      color: white;
+      padding: 16px 40px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+    
+    .cta-button:hover {
+      background: #e55a2b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+    }
+    
+    .footer-note {
+      margin-top: 40px;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+    
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 1.8rem;
+      }
+      
+      .section-title {
+        font-size: 1.5rem;
+      }
+      
+      .scenario-buttons {
+        grid-template-columns: 1fr;
+      }
+      
+      .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .profile-cards {
+        grid-template-columns: 1fr;
+      }
+      
+      table {
+        font-size: 0.9rem;
+      }
+      
+      th, td {
+        padding: 12px 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <h1>Occuply Lease Mix Modeling</h1>
+      <p>Real-time lease-mix scenario modeling — Test pricing and incentive strategies before deploying them</p>
+      <p class="header-note">Interactive POC • Scenario-based forecasting • Like IPSOS Activate, but for leasing</p>
+    </div>
+  </header>
+
+  <!-- Section 1: The Problem -->
+  <section class="problem-section">
+    <div class="container">
+      <h2 class="section-title">Property A: Ground Floor 1BRs - The $35K Problem</h2>
+      <p class="section-subtitle">Ground-floor 1BRs take nearly twice as long to lease. That vacancy time is pure portfolio bleed.</p>
+      
+      <div class="chart-container">
+        <canvas id="daysChart"></canvas>
+      </div>
+      
+      <div class="stat-callout">
+        <div class="big-number">$34,776</div>
+        <div class="explanation">lost rent from slow ground-floor absorption</div>
+        <div class="explanation" style="margin-top: 15px; font-size: 0.9rem;">
+          12 ground floor units × 46 extra days × $75/day = $34,776 annual loss
+        </div>
       </div>
     </div>
-    
-    <div class="metric">
-      <div class="metric-label">Avg days</div>
-      <div class="metric-value">
-        <span class="avg-days-number">94</span> days
+  </section>
+
+  <!-- Section 2: Occuply Identifies the Match -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">Occuply Identifies the Match</h2>
+      <p class="section-subtitle">The insight isn't "discount more." It's "discount to the segment that will actually take the ground floors."</p>
+      
+      <div class="profile-cards">
+        <div class="profile-card highlighted">
+          <div class="profile-badge">Best Match</div>
+          <h3>Budget-Conscious Movers</h3>
+          
+          <div class="profile-item">
+            <div class="profile-label">Share of demand</div>
+            <div class="profile-value">38% of Atlanta market</div>
+          </div>
+          
+          <div class="profile-item">
+            <div class="profile-label">Actual budget</div>
+            <div class="profile-value">$1,400–1,700</div>
+          </div>
+          
+          <div class="profile-item">
+            <div class="profile-label">Ground floor acceptance</div>
+            <div class="profile-value">Yes, with 10–15% discount</div>
+          </div>
+          
+          <div class="profile-item">
+            <div class="profile-label">Concession sensitivity</div>
+            <div class="profile-value">81% (high)</div>
+          </div>
+          
+          <div class="profile-item">
+            <div class="profile-label">Decision speed</div>
+            <div class="profile-value">48% sign within 7 days</div>
+          </div>
+        </div>
+        
+        <div class="profile-card">
+          <div class="profile-badge not-match">Not the lever</div>
+          <h3>Deliberate Families</h3>
+          
+          <div class="profile-item">
+            <div class="profile-label">Share of market</div>
+            <div class="profile-value">29%</div>
+          </div>
+          
+          <div class="profile-item">
+            <div class="profile-label">Budget</div>
+            <div class="profile-value">$2,000–2,400</div>
+          </div>
+          
+          <div class="profile-item">
+            <div class="profile-label">Primary driver</div>
+            <div class="profile-value">Layout / schools / timing</div>
+          </div>
+        </div>
+        
+        <div class="profile-card">
+          <div class="profile-badge not-match">Not the lever</div>
+          <h3>Premium Seekers</h3>
+          
+          <div class="profile-item">
+            <div class="profile-label">Share of market</div>
+            <div class="profile-value">18%</div>
+          </div>
+          
+          <div class="profile-item">
+            <div class="profile-label">Budget</div>
+            <div class="profile-value">$2,400+</div>
+          </div>
+          
+          <div class="profile-item">
+            <div class="profile-label">Primary driver</div>
+            <div class="profile-value">Views / upgrades / status</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="match-arrow">MATCH →</div>
+    </div>
+  </section>
+
+  <!-- Section 3: Scenario Modeling (THE ACTIVATE MOMENT) -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">Model Your Strategy — Before You Deploy</h2>
+      <p class="section-subtitle">Test different approaches and forecast outcomes. This is the "Activate" moment — see what happens before you spend.</p>
+      
+      <div class="scenario-selector">
+        <div class="scenario-title">Select a Strategy</div>
+        <div class="scenario-subtitle">Click any scenario to see forecasted outcomes</div>
+        
+        <div class="scenario-buttons">
+          <!-- Scenario A: Blanket -->
+          <div class="scenario-button active" data-scenario="blanket">
+            <div class="scenario-label default">Current Default</div>
+            <h4>Blanket Strategy</h4>
+            <p><strong>Strategy:</strong> 2 months free to everyone</p>
+            <p><strong>Targeting:</strong> Universal</p>
+            <p><strong>Pricing:</strong> $1,900 all units</p>
+          </div>
+          
+          <!-- Scenario B: Targeted -->
+          <div class="scenario-button" data-scenario="targeted">
+            <div class="scenario-label recommended">Recommended</div>
+            <h4>Targeted LMM Strategy</h4>
+            <p><strong>Strategy:</strong> 1 month free to Budget-Conscious only</p>
+            <p><strong>Targeting:</strong> Segment-specific</p>
+            <p><strong>Pricing:</strong> $1,650 ground floors</p>
+          </div>
+          
+          <!-- Scenario C: Light Touch -->
+          <div class="scenario-button" data-scenario="light">
+            <div class="scenario-label light">Alternative</div>
+            <h4>Light Touch Strategy</h4>
+            <p><strong>Strategy:</strong> Price discount only, no concession</p>
+            <p><strong>Targeting:</strong> Market-wide</p>
+            <p><strong>Pricing:</strong> $1,750 ground floors</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Results Display -->
+      <div class="results-display">
+        <div class="results-title">Forecasted Outcome: <span id="scenario-name">Blanket Strategy</span></div>
+        <p style="text-align: center; color: var(--medium-grey); font-size: 0.9rem; margin-bottom: 20px;">
+          Forecasts are seasonally adjusted based on market, month, and unit type
+        </p>
+        
+        <div class="metrics-grid">
+          <div class="metric">
+            <div class="metric-label">Units Filled</div>
+            <div class="metric-value" id="units-filled">8 of 12</div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-label">Avg Days to Lease</div>
+            <div class="metric-value" id="avg-days">94 days</div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-label">Concession Spend</div>
+            <div class="metric-value" id="concession-cost">$60,000</div>
+          </div>
+          
+          <div class="metric">
+            <div class="metric-label">Confidence</div>
+            <div class="metric-value" id="confidence">82%</div>
+          </div>
+        </div>
+        
+        <div class="roi-callout" id="roi-callout">
+          <div class="roi-big">
+            <span id="roi-text">Baseline (No Savings)</span>
+          </div>
+          <div class="roi-detail" id="roi-detail">
+            Current approach — Universal deployment, no targeting
+          </div>
+        </div>
       </div>
     </div>
-    
-    <div class="metric">
-      <div class="metric-label">Concession cost</div>
-      <div class="metric-value">
-        $<span class="concession-cost-number">60,000</span>
+  </section>
+
+  <!-- Section 4: The Takeaway -->
+  <section>
+    <div class="container">
+      <h2 class="section-title">What Just Happened</h2>
+      <p class="section-subtitle">You modeled three strategies in real time — testing outcomes before spending a dollar. That's decision intelligence.</p>
+      
+      <div class="comparison-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Blanket (Default)</th>
+              <th>Targeted LMM</th>
+              <th>Light Touch</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Strategy</strong></td>
+              <td>Universal concessions</td>
+              <td>Segment-specific</td>
+              <td>Price-only adjustment</td>
+            </tr>
+            <tr>
+              <td><strong>Concession Cost</strong></td>
+              <td>$60,000</td>
+              <td class="table-highlight">$19,800</td>
+              <td>$0</td>
+            </tr>
+            <tr>
+              <td><strong>Units Filled</strong></td>
+              <td>8 of 12</td>
+              <td class="table-highlight">11 of 12</td>
+              <td>9 of 12</td>
+            </tr>
+            <tr>
+              <td><strong>Avg Days</strong></td>
+              <td>94 days</td>
+              <td class="table-highlight">58 days</td>
+              <td>72 days</td>
+            </tr>
+            <tr>
+              <td><strong>Savings vs Baseline</strong></td>
+              <td>—</td>
+              <td class="table-highlight">$40,200</td>
+              <td>$12,500</td>
+            </tr>
+            <tr>
+              <td><strong>ROI</strong></td>
+              <td>—</td>
+              <td class="table-highlight">4.2x</td>
+              <td>2.8x</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-    
-    <div class="metric">
-      <div class="metric-label">Confidence</div>
-      <div class="metric-value confidence-number">—</div>
+  </section>
+
+  <!-- Section 5: CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <h2 class="section-title">This is ONE underperforming floorplan at ONE property.</h2>
+      <p class="section-subtitle">Occuply models lease-mix scenarios across your entire portfolio — before you deploy capital.</p>
+      
+      <a href="mailto:austinlcrogers@gmail.com" class="cta-button">Learn More</a>
+      
+      <p class="footer-note">POC Demo • Scenario-based forecasting • Directionally accurate decision support</p>
     </div>
-  </div>
+  </section>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   
-  <button class="show-lmm-btn">Show LMM Strategy</button>
-  
-  <!-- Savings callout (hidden initially) -->
-  <div class="savings-callout" style="display: none;">
-    <div class="savings-big">
-      Savings: $<span class="savings-amount">0</span> | 
-      ROI: <span class="roi-amount">—</span>
-    </div>
-    <div class="savings-detail">
-      Concession waste reduced <strong>68%</strong>
-    </div>
-  </div>
-</div>
+  <script>
+    // Create bar chart
+    const ctx = document.getElementById('daysChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Ground Floor 1BRs', 'Upper Floor 1BRs'],
+        datasets: [{
+          label: 'Days to Lease',
+          data: [94, 48],
+          backgroundColor: ['#ff6b35', '#16a085'],
+          borderColor: ['#e55a2b', '#138871'],
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false
+          },
+          title: {
+            display: true,
+            text: 'Days to Lease (1BR)',
+            font: {
+              size: 18,
+              weight: 'bold'
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Days',
+              font: {
+                size: 14,
+                weight: 'bold'
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Scenario data
+    const scenarios = {
+      blanket: {
+        name: 'Blanket Strategy',
+        unitsFilled: '8 of 12',
+        avgDays: '94 days',
+        concessionCost: '$60,000',
+        confidence: '82%',
+        roiText: 'Baseline (No Savings)',
+        roiDetail: 'Current approach — Universal deployment, no targeting'
+      },
+      targeted: {
+        name: 'Targeted LMM Strategy',
+        unitsFilled: '11 of 12',
+        avgDays: '58 days',
+        concessionCost: '$19,800',
+        confidence: '86%',
+        roiText: 'Savings: $40,200 | ROI: 4.2x',
+        roiDetail: 'Concession waste reduced 68% — Segment-specific targeting (Seasonally adjusted baseline: 72 days | Strategy lift: -14 days)'
+      },
+      light: {
+        name: 'Light Touch Strategy',
+        unitsFilled: '9 of 12',
+        avgDays: '72 days',
+        concessionCost: '$0',
+        confidence: '78%',
+        roiText: 'Savings: $12,500 | ROI: 2.8x',
+        roiDetail: 'Price adjustment only — No concession deployment'
+      }
+    };
+
+    // Scenario button functionality
+    const scenarioButtons = document.querySelectorAll('.scenario-button');
+    const scenarioName = document.getElementById('scenario-name');
+    const unitsFilled = document.getElementById('units-filled');
+    const avgDays = document.getElementById('avg-days');
+    const concessionCost = document.getElementById('concession-cost');
+    const confidence = document.getElementById('confidence');
+    const roiText = document.getElementById('roi-text');
+    const roiDetail = document.getElementById('roi-detail');
+
+    scenarioButtons.forEach(button => {
+      button.addEventListener('click', function() {
+        // Remove active class from all buttons
+        scenarioButtons.forEach(btn => btn.classList.remove('active'));
+        
+        // Add active class to clicked button
+        this.classList.add('active');
+        
+        // Get scenario data
+        const scenario = this.dataset.scenario;
+        const data = scenarios[scenario];
+        
+        // Update display
+        scenarioName.textContent = data.name;
+        unitsFilled.textContent = data.unitsFilled;
+        avgDays.textContent = data.avgDays;
+        concessionCost.textContent = data.concessionCost;
+        confidence.textContent = data.confidence;
+        roiText.textContent = data.roiText;
+        roiDetail.textContent = data.roiDetail;
+        
+        // Add fade-in animation
+        const resultsDisplay = document.querySelector('.results-display');
+        resultsDisplay.classList.remove('fade-in');
+        void resultsDisplay.offsetWidth; // Trigger reflow
+        resultsDisplay.classList.add('fade-in');
+      });
+    });
+  </script>
+
+</body>
+</html>
